@@ -4,6 +4,8 @@ import userRouter from "./user/userRouter";
 
 const app = express()
 
+app.use(express.json())
+
 app.use('/home', (req, res, next) => {
   res.json({message:"Hello world!"})
   // const error = createHttpError(400, "Something went wrong!")
