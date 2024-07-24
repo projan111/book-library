@@ -41,7 +41,7 @@ const createUser = async(req: Request, res: Response, next: NextFunction) => {
   }
   // Generate JWT Token
   try{
-    const token = sign({sub: newUser._id}, config.jwtSecret as string, {expiresIn: "7d"})
+    const token = sign({sub: newUser._id}, config.jwtSecret as string, {expiresIn: "7d", algorithm: "HS256"})
     res.status(201).json({accessToken: token});
   }catch(err){
     return next(createHttpError(500, "Error while generating jwt token."))
@@ -51,7 +51,28 @@ const createUser = async(req: Request, res: Response, next: NextFunction) => {
 }
 
 const loginUser = async(req: Request, res:Response, next:NextFunction) => {
-  res.json({message: "OK"})
+  const {email, password} = req.body;
+  // Validate
+  if(!email || !password) {
+    return next(createHttpError(400, "All fields are required!"));
+  }
+  // Database check
+    const user = await userModel.findOne({email});
+    if(!user){
+      return next(createHttpError(404, "User not found!"))
+    }
+  // Check if password is matched
+  const isMatch = await bcrypt.compare(password, user.password);
+  if(!isMatch){
+    return next(createHttpError(400, "Password does not matched!"))
+  }
+
+  // Create access Token
+  const token = sign({sub: user._id}, config.jwtSecret as string, {expiresIn: "7d", algorithm: "HS256"})
+    
+
+
+  res.json({accessToken: token})
 }
 
 export {createUser, loginUser};
