@@ -159,5 +159,40 @@ const getSingleBook = async (req: Request, res: Response, next: NextFunction) =>
     return next(createHttpError(500, "Error while getting a book"))
   }
 }
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  const bookId = req.params.bookId;
+  
+  try{
+    // todo: add pagination
+    const book = await bookModel.findOne({_id:bookId})
 
-export {createBook, updateBook, listBook, getSingleBook}
+    if(!book){
+      return next(createHttpError(404, "Book not found!!!"))
+    }
+
+    // Check access 
+    const _req = req as AuthRequest;
+    if (book.author.toString() !== _req.userId){
+      return next(createHttpError(403, "You can not delete others' book"))
+    }
+
+    const splitFileUrl = book.coverImage.split('/');
+    const coverImagePublicId = splitFileUrl.at(-2) + "/" + splitFileUrl.at(-1)?.split(".").at(-2);
+
+    const splitBookFile = book.coverImage.split('/');
+    const bookFilePublicId = splitBookFile.at(-2) + "/" + splitBookFile.at(-1);
+    
+    // Todo: try-block
+    await cloudinary.uploader.destroy(coverImagePublicId)
+    await cloudinary.uploader.destroy(bookFilePublicId, {resource_type: 'raw'})
+
+    await bookModel.deleteOne({_id: bookId})
+    
+    return res.status(204);
+
+  }catch(err){
+    return next(createHttpError(500, "Error while getting a book"))
+  }
+}
+
+export {createBook, updateBook, listBook, getSingleBook, deleteBook}
