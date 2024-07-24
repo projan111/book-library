@@ -1,11 +1,13 @@
 import {Request, Response, NextFunction } from "express";
 import cloudinary from "../config/cloudinery";
 import path from "node:path";
+import fs from "node:fs";
 import createHttpError from "http-errors";
+import bookModel from "./bookModel";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
 
-  console.log('files:', req.files)
+  const {title, genre} = req.body;
 
   const files = req.files as {[fieldname: string]: Express.Multer.File[]};
 
@@ -33,8 +35,27 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     console.log("upload pdf result:", bookFileUploadResult)
     
     console.log("upload result:", uploadResult)
+
+    // Create new book
+    const newBook = await bookModel.create({
+      title,
+      genre,
+      author: '669e8c09a41068fa0288551a',
+      coverImage: uploadResult.secure_url,
+      file: bookFileUploadResult.secure_url,
+    })
+
+    // Delete temp file
+    try {
+      await fs.promises.unlink(filePath)
+      await fs.promises.unlink(bookFilePath)
+      
+    } catch (error) {
+      console.log(error)
+      return next(createHttpError(500, "Failed to delete files!!!"))
+    }
   
-    res.status(201).json({message: "Book router is working fine"});
+    res.status(201).json({id: newBook._id});
     
   } catch (error) {
     console.log(error)
