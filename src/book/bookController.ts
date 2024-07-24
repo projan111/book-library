@@ -12,7 +12,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
 
   const files = req.files as {[fieldname: string]: Express.Multer.File[]};
 
-  const coverImageMimeType = files.coverImage[0].mimetype.split('/').pop();
+  const coverImageMimeType = files.coverImage[0].mimetype.split('/').at(-1);
   const fileName = files.coverImage[0].filename;
   const filePath = path.resolve(__dirname, '../../public/data/uploads' , fileName);
 
@@ -86,7 +86,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
   let completeCoverImage = "";
   if (files.coverImage){
     const filename = files.coverImage[0].filename;
-    const coverMimeType = files.coverImage[0].mimetype.split('/').pop();
+    const coverMimeType = files.coverImage[0].mimetype.split('/').at(-1);
     
     // Send file to cloudinary
     const filePath = path.resolve(__dirname, '../../public/data/uploads', filename);
@@ -143,6 +143,7 @@ const listBook = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Error while getting a book"))
   }
 }
+
 const getSingleBook = async (req: Request, res: Response, next: NextFunction) => {
   const bookId = req.params.bookId;
   
@@ -159,6 +160,7 @@ const getSingleBook = async (req: Request, res: Response, next: NextFunction) =>
     return next(createHttpError(500, "Error while getting a book"))
   }
 }
+
 const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
   const bookId = req.params.bookId;
   
