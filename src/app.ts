@@ -1,6 +1,7 @@
 import express from "express"
 import globleErrorHandler from "./middlewares/globleErrorHandler";
 import userRouter from "./user/userRouter";
+import bookRouter from "./book/bookRouter";
 
 const app = express()
 
@@ -13,6 +14,7 @@ app.use('/home', (req, res, next) => {
 })
 // From user Router (Express)
 app.use("/api/user", userRouter);
+app.use("/api/books", bookRouter);
 // From middlewares Htttp Error handler
 app.use(globleErrorHandler)
 
