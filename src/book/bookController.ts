@@ -36,6 +36,9 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     
     console.log("upload result:", uploadResult)
 
+    // @ts-ignore
+    console.log("userId", req.userId)
+
     // Create new book
     const newBook = await bookModel.create({
       title,
