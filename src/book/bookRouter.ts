@@ -8,7 +8,8 @@ const bookRouter = express.Router()
 // file store local -> cloudinery -> delete local files
 const upload = multer({
   dest: path.resolve(__dirname, "../../public/data/uploads"),
-  limits: {fileSize: 3e7}
+  // todo: put limit less than 10mb max;
+  limits: {fileSize: 10 * 1024 * 1024}
 })
 
 bookRouter.post("/",upload.fields([
