@@ -12,8 +12,17 @@ app.use(express.json());
 app.use(cors({
   origin: config.frontend_domain,
 }));
+
 //Test
-app.use('/home', (req, res, next) => {
+app.get("/health-check", (req, res, next) => {
+  res.status(200).json({
+    message: "APIs are working fine",
+    meta: true,
+    data: ""
+  })
+})
+
+app.get('/', (req, res, next) => {
   res.json({message:"Hello world!"})
   // const error = createHttpError(400, "Something went wrong!")
   // throw error; 
